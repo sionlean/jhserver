@@ -3,6 +3,7 @@ require("dotenv").config();
 import cors from "cors";
 import express from "express";
 
+
 // Local Modules
 import AppHelper from "./appHelper";
 import AuthenticationRouter from "./routes/authenticationRouter";
@@ -13,7 +14,7 @@ import OpenAIRouter from "./routes/openAIRouter";
 import { getWhitelistedOrigins } from "./utils";
 
 // Constants
-import { MAIN_ROUTES, PORT } from "./constant";
+import { MAIN_ROUTES } from "./constant";
 
 const app = express();
 
@@ -29,4 +30,4 @@ app.use(MAIN_ROUTES.AUTHENTICATION, AuthenticationRouter);
 app.use(MAIN_ROUTES.OPEN_AI, OpenAIRouter);
 app.use(MAIN_ROUTES.DIRECTIONS, GoogleDirectionsRouter);
 
-app.listen(PORT);
+app.listen(process.env.PORT);

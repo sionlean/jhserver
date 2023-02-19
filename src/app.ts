@@ -3,7 +3,6 @@ require("dotenv").config();
 import cors from "cors";
 import express from "express";
 
-
 // Local Modules
 import AppHelper from "./appHelper";
 import AuthenticationRouter from "./routes/authenticationRouter";

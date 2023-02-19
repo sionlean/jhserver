@@ -1,6 +1,6 @@
 // External Modules
-import rateLimit, { RateLimitRequestHandler } from "express-rate-limit";
 import jwt from "jsonwebtoken";
+import rateLimit, { RateLimitRequestHandler } from "express-rate-limit";
 import { NextFunction, Request, Response } from "express";
 
 // Local Modules

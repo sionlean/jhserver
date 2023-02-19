@@ -27,7 +27,8 @@
     "build": "tsc",
     "buildStart": "npm run build && npm run start",
     "push": "npm run build && ./sync.sh",
-    "start": "npx pm2 start ./build/app.js --watch",
-    "test": "nodemon ./src/app.ts"
+    "start": "npx pm2 start ./build/app.js --watch -n jhserver",
+    "test": "nodemon ./src/app.ts",
+    "restart": "npx pm2 restart jhserver"
   }
 }

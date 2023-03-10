@@ -16,8 +16,9 @@ router.post(ROUTE_AUTHENTICATION.GET_TOKEN, (req: Request, res: Response) => {
     const payload: Object = { message: "Access granted" };
     const options: jwt.SignOptions = { expiresIn: "7d" };
     const access_token = jwt.sign(payload, getJwtSecretKey(), options);
+    const expiry = new Date().getTime() + 7 * 24 * 60 * 60 * 1000;
 
-    res.status(200).send({ access_token });
+    res.status(200).send({ access_token, expiry });
   } else {
     const errorResponse = {
       error: {

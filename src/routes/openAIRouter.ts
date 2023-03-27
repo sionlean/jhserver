@@ -18,9 +18,11 @@ import { MODEL_AI, ROUTE_AI, TYPE_AI_QUERY } from "../constant";
 import {
   addCodeMessage,
   addResponseMessage,
+  addTokenUsedSinceStartup,
   clearCodeMessages,
   clearResponseMessages,
   getCodeMessages,
+  getEstimatedCostSinceStartup,
   getResponseMessages,
 } from "../store/openAIState";
 
@@ -38,6 +40,11 @@ router.get(ROUTE_AI.CURRENT_MODEL, async (_, res) => {
   }
 
   return res.status(200).json({ data: { model: currentModel } });
+});
+
+router.get(ROUTE_AI.GET_ESIMATED_COST, async (_, res) => {
+  const estimatedCost = getEstimatedCostSinceStartup();
+  return res.status(200).json({ data: { cost: estimatedCost } });
 });
 
 router.get(ROUTE_AI.LIST_AVAILABLE_MODELS, async (_, res) => {
@@ -71,6 +78,7 @@ router.post(ROUTE_AI.CHANGE_MODEL, async (req, res) => {
 
 router.post(ROUTE_AI.GENERATE_RESPONSE, async (req, res) => {
   const { text, includePrevResp, type } = req.body;
+
   if (!text)
     return res.status(400).send(ErrorManager.getMissingTextParamError());
 
@@ -110,11 +118,14 @@ const callChatCompletionApi = async (
   };
 
   try {
-    // response.data.usage?.total_tokens
     const response = await openai.createChatCompletion(chatRequest);
     const reply = response.data.choices[0].message?.content;
+    const tokenUsed = response.data.usage?.total_tokens;
+    addTokenUsedSinceStartup(tokenUsed);
+
     return res.status(200).json({ data: { reply } });
   } catch (err) {
+    console.log(err);
     return res.status(400).send(errMethod(err));
   }
 };
@@ -197,6 +208,14 @@ const generateOpenAIResponse = async (
     };
     return res.status(400).send(errorResponse);
   }
+};
+
+const encodeParams = (params: { [key: string]: any }): string => {
+  return Object.keys(params)
+    .map(function (key) {
+      return [key, params[key]].map(encodeURIComponent).join("=");
+    })
+    .join("&");
 };
 
 export default router;

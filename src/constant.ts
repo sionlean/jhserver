@@ -16,6 +16,7 @@ export enum ROUTE_AI {
   CHANGE_MODEL = "/changeModel",
   CURRENT_MODEL = "/currentModel",
   GENERATE_RESPONSE = "/generateResponse",
+  GET_ESIMATED_COST = "/getEstimatedCost",
   LIST_AVAILABLE_MODELS = "/listAvailableModels",
   LIST_OPEN_AI_MODELS = "/listOpenAIModels",
 }

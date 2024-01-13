@@ -6,6 +6,8 @@
   "author": "sionljh",
   "license": "ISC",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.3.35",
+    "cohere-ai": "^6.2.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
@@ -24,7 +26,7 @@
     "typescript": "^4.9.5"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rm -rf ./build && tsc",
     "buildStart": "npm run build && npm run start",
     "push": "npm run build && ./sync.sh",
     "start": "npx pm2 start ./build/app.js --watch -n jhserver",

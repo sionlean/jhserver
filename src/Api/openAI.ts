@@ -8,6 +8,7 @@ import {
 } from "openai";
 
 // Local Modules
+import AIBase from "./aiBase";
 import AIErrorManager from "../lib/aiErrorManager";
 
 // Interfaces
@@ -28,8 +29,17 @@ import {
   getResponseMessages,
 } from "../store/openAIState";
 
-export default class OpenAI {
-  constructor() {}
+export default class OpenAI implements AIBase {
+  private static _instance: OpenAI;
+  private constructor() {}
+
+  static getInstance = (): OpenAI => {
+    if (!OpenAI._instance) {
+      OpenAI._instance = new OpenAI();
+    }
+
+    return OpenAI._instance;
+  };
 
   configuration = new Configuration({ apiKey: process.env.OPEN_AI_TOKEN });
   openai = new OpenAIApi(this.configuration);
@@ -74,8 +84,8 @@ export default class OpenAI {
 
   generateResponse = (
     text: string,
-    includePrevResp: boolean,
-    type: TYPE_AI_QUERY
+    includePrevResp = false,
+    type = TYPE_AI_QUERY.ASSIT
   ): Promise<string | CustomError> | CustomError => {
     if (!text) return AIErrorManager.getMissingTextParamError();
 

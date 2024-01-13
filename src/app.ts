@@ -4,10 +4,11 @@ import cors from "cors";
 import express from "express";
 
 // Local Modules
+import AIRouter from "./routes/aiRouter";
 import AppHelper from "./appHelper";
 import AuthenticationRouter from "./routes/authenticationRouter";
 import GoogleDirectionsRouter from "./routes/googleDirectionsRouter";
-import OpenAIRouter from "./routes/openAIRouter";
+import GoogleNearby from "./Api/googleNearby";
 
 // Utils
 import { getWhitelistedOrigins } from "./utils";
@@ -26,7 +27,10 @@ app.use(AppHelper.rateLimiterError); // Throw customized error when rate limited
 
 // Set all different main routes
 app.use(MAIN_ROUTES.AUTHENTICATION, AuthenticationRouter);
-app.use(MAIN_ROUTES.OPEN_AI, OpenAIRouter);
+app.use(MAIN_ROUTES.AI, AIRouter);
 app.use(MAIN_ROUTES.DIRECTIONS, GoogleDirectionsRouter);
 
-app.listen(process.env.PORT);
+app.listen(process.env.PORT, () => {
+  console.log("Server started...");
+  GoogleNearby.getInstance().getNearbyPlaces("Beauty world");
+});

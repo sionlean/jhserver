@@ -7,6 +7,7 @@ import {
 } from "cohere-ai/dist/models";
 
 // Local Modules
+import AIBase from "./aiBase";
 import AIErrorManager from "../lib/aiErrorManager";
 
 // Interfaces
@@ -15,8 +16,17 @@ import { CustomError } from "../Interfaces/general";
 // Constants
 import { MODEL_COHERE } from "../constant";
 
-export default class Cohere {
-  constructor() {}
+export default class Cohere implements AIBase {
+  private static _instance: Cohere;
+  private constructor() {}
+
+  static getInstance = (): Cohere => {
+    if (!Cohere._instance) {
+      Cohere._instance = new Cohere();
+    }
+
+    return Cohere._instance;
+  };
 
   cohere = cohere.init(process.env.COHERE_TOKEN!);
   currentModel: string = MODEL_COHERE.COMMAND;

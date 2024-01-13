@@ -12,9 +12,18 @@ import DirectionsErrorManager from "../lib/directionsErrorManager";
 import { CustomError } from "../Interfaces/general";
 
 export default class GoogleGeocode extends GoogleBase {
-  constructor() {
+  private static _instance: GoogleGeocode;
+  private constructor() {
     super();
   }
+
+  static getInstance = (): GoogleGeocode => {
+    if (!GoogleGeocode._instance) {
+      GoogleGeocode._instance = new GoogleGeocode();
+    }
+
+    return GoogleGeocode._instance;
+  };
 
   private geocode = this.client.geocode;
   private country = "SG";

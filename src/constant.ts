@@ -1,10 +1,10 @@
 export enum MAIN_ROUTES {
+  AI = "/ai",
   AUTHENTICATION = "/auth",
   DIRECTIONS = "/directions",
-  OPEN_AI = "/openAI",
 }
 
-export enum MODEL_AI {
+export enum MODEL_OPEN_AI {
   ADA = "text-ada-001",
   BABBAGE = "text-babbage-001",
   CHAT_GPT = "gpt-3.5-turbo",
@@ -12,17 +12,36 @@ export enum MODEL_AI {
   DAVINCI = "text-davinci-003",
 }
 
+export enum MODEL_COHERE {
+  COMMAND_LIGHT = "command-light", // A smaller, faster version of command. Almost as capable, but a lot faster. Uses Co.generate()
+  COMMAND = "command", // An instruction-following conversational model that performs language tasks with high quality, more reliably and with a longer context than our base generative models. Uses Co.generate()
+  GENERATION = "base", // A smaller, faster version of base. Almost as capable, but a lot faster. Uses Co.generate()
+  GENERATION_LIGHT = "base-light", // A model that performs generative language tasks. Uses Co.generate()
+  REPRESENTATION = "embed-english-v2.0", // A smaller, faster version of embed-english-v2.0. Almost as capable, but a lot faster. English only. Uses Co.Classify(), Co.Embed(), Co.Detect_language(), Co.Tokenize(), Co.Detokenize()
+  REPRESENTATION_LIGHT = "embed-english-light-v2.0", // A model that allows for text to be classified or turned into embeddings. English only. Uses Co.Classify(), Co.Embed(), Co.Detect_language(), Co.Tokenize(), Co.Detokenize()
+  REPRESENTATION_MULTILINGUAL = "embed-multilingual-v2.0", // Provides multilingual classification and embedding support. See supported languages here. Uses Co.Classify(), Co.Embed(), Co.Detect_language(), Co.Tokenize(), Co.Detokenize()
+  RERANK = "rerank-english-v2.0", // A model that allows for re-ranking English language documents. Uses Co.rerank()
+  RERANK_MULTILINGUAL = "rerank-multilingual-v2.0", // A model for documents that are not in English. Supports the same languages as embed-multilingual-v2.0. Uses Co.rerank()
+  SUMMARIZE_LIGHT = "summarize-medium", // A smaller, faster version of summarize-xlarge. Almost as capable, but a lot faster. Uses Co.summarize()
+  SUMMARIZE = "summarize-xlarge", // A model that takes a piece of text and generates a summary. Uses Co.summarize()
+}
+
 export enum ROUTE_AI {
   CHANGE_MODEL = "/changeModel",
+  CHANGE_PROVIDER = "/changeProvider",
   CURRENT_MODEL = "/currentModel",
   GENERATE_RESPONSE = "/generateResponse",
   GET_ESIMATED_COST = "/getEstimatedCost",
   LIST_AVAILABLE_MODELS = "/listAvailableModels",
-  LIST_OPEN_AI_MODELS = "/listOpenAIModels",
 }
 
 export enum ROUTE_AUTHENTICATION {
   GET_TOKEN = "/getToken",
+}
+
+export enum TYPE_AI_PROVIDER {
+  OPEN_AI = "openAI",
+  COHERE = "cohere",
 }
 
 export enum TYPE_AI_QUERY {

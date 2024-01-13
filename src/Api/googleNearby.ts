@@ -7,18 +7,25 @@ import GoogleBase from "./googleBase";
 import GoogleGeocode from "./googleGeocode";
 
 export default class GoogleNearby extends GoogleBase {
-  constructor() {
+  private static _instance: GoogleNearby;
+  private constructor() {
     super();
   }
 
+  static getInstance = (): GoogleNearby => {
+    if (!GoogleNearby._instance) {
+      GoogleNearby._instance = new GoogleNearby();
+    }
+
+    return GoogleNearby._instance;
+  };
+
   private nearby = this.client.placesNearby;
-  private geocode = new GoogleGeocode();
 
   getNearbyPlaces = async (address: string, keyword?: string): Promise<any> => {
     try {
-      const geocodeInfo = await this.geocode.getGeocodeInfoFromLocation(
-        address
-      );
+      const geocodeInfo =
+        await GoogleGeocode.getInstance().getGeocodeInfoFromLocation(address);
 
       if (DirectionsErrorManager.isCustomError(geocodeInfo)) throw geocodeInfo;
 
@@ -48,6 +55,7 @@ export default class GoogleNearby extends GoogleBase {
       } else if (!results?.length) {
         throw new Error("No results found");
       } else {
+        console.log(results);
         return results;
         // const filteredPlaces = results
         //   .filter((result) => result.business_status === "OPERATIONAL")

@@ -3,7 +3,9 @@ export const checkPassword = (password: string): boolean => {
 };
 
 export const getWhitelistedOrigins = (): string[] => {
-  return process.env.WHITELISTED_ORIGINS!.split(",");
+  return process.env.WHITELISTED_ORIGINS
+    ? process.env.WHITELISTED_ORIGINS.split(",")
+    : [];
 };
 
 export const getJwtSecretKey = (): string => {

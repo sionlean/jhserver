@@ -27,7 +27,7 @@ router.post(ROUTE_AUTHENTICATION.GET_TOKEN, (req: Request, res: Response) => {
         details: "The 'password' parameter is wrong. Please try again.",
       },
     };
-    return res.status(401).send(errorResponse);
+    res.status(401).send(errorResponse);
   }
 });
 

@@ -3,10 +3,10 @@ import { PlacesNearbyRanking } from "@googlemaps/google-maps-services-js";
 
 // Local Modules
 import DirectionsErrorManager from "../lib/directionsErrorManager";
-import GoogleBase from "./googleBase";
+import GoogleMapBase from "./googleMapBase";
 import GoogleGeocode from "./googleGeocode";
 
-export default class GoogleNearby extends GoogleBase {
+export default class GoogleNearby extends GoogleMapBase {
   private static _instance: GoogleNearby;
   private constructor() {
     super();
@@ -81,6 +81,7 @@ export default class GoogleNearby extends GoogleBase {
         // return filteredPlaces;
       }
     } catch (err) {
+      // console.log(err);
       return DirectionsErrorManager.getErrorGettingNearbyPlaces(err);
     }
 

@@ -3,11 +3,12 @@ import express, { Request, Response } from "express";
 
 // Local Modules
 import AIErrorManager from "../lib/aiErrorManager";
-import Cohere from "../Api/cohere";
-import OpenAI from "../Api/openAI";
+import Cohere from "../api/cohere";
+import OpenAI from "../api/openAI";
 
 // Constants
-import { ROUTE_AI, TYPE_AI_PROVIDER } from "../constant";
+import { ROUTE_AI } from "../constants/routes";
+import { TYPE_AI_PROVIDER } from "../constants/constant";
 
 const router = express.Router();
 let currentProvider: Cohere | OpenAI = Cohere.getInstance();

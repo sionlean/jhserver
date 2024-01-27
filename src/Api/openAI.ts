@@ -15,7 +15,7 @@ import AIErrorManager from "../lib/aiErrorManager";
 import { CustomError } from "../Interfaces/general";
 
 // Constants
-import { MODEL_OPEN_AI, TYPE_AI_QUERY } from "../constant";
+import { MODEL_OPEN_AI, TYPE_AI_QUERY } from "../../constants/constant";
 
 // Store
 import {

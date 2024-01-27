@@ -2,7 +2,7 @@
 import { CustomError } from "../Interfaces/general";
 
 // Constants
-import { TYPE_AI_QUERY } from "../constant";
+import { TYPE_AI_QUERY } from "../../constants/constant";
 
 export default abstract class AIBase {
   constructor() {}

@@ -7,14 +7,14 @@ import express from "express";
 import AIRouter from "./routes/aiRouter";
 import AppHelper from "./appHelper";
 import AuthenticationRouter from "./routes/authenticationRouter";
-import GoogleDirectionsRouter from "./routes/googleDirectionsRouter";
-import GoogleNearby from "./Api/googleNearby";
+import GoogleMapRouter from "./routes/googleMapRouter";
+import GoogleNearby from "./api/googleNearby";
 
 // Utils
 import { getWhitelistedOrigins } from "./utils";
 
 // Constants
-import { MAIN_ROUTES } from "./constant";
+import { MAIN_ROUTES } from "./constants/routes";
 
 const app = express();
 
@@ -28,9 +28,9 @@ app.use(AppHelper.rateLimiterError); // Throw customized error when rate limited
 // Set all different main routes
 app.use(MAIN_ROUTES.AUTHENTICATION, AuthenticationRouter);
 app.use(MAIN_ROUTES.AI, AIRouter);
-app.use(MAIN_ROUTES.DIRECTIONS, GoogleDirectionsRouter);
+app.use(MAIN_ROUTES.MAPS, GoogleMapRouter);
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT, async () => {
   console.log("Server started...");
-  GoogleNearby.getInstance().getNearbyPlaces("Beauty world");
+  const resp = await GoogleNearby.getInstance().getNearbyPlaces("Beauty world");
 });

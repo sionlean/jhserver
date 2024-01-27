@@ -1,9 +1,3 @@
-export enum MAIN_ROUTES {
-  AI = "/ai",
-  AUTHENTICATION = "/auth",
-  DIRECTIONS = "/directions",
-}
-
 export enum MODEL_OPEN_AI {
   ADA = "text-ada-001",
   BABBAGE = "text-babbage-001",
@@ -26,19 +20,6 @@ export enum MODEL_COHERE {
   SUMMARIZE = "summarize-xlarge", // A model that takes a piece of text and generates a summary. Uses Co.summarize()
 }
 
-export enum ROUTE_AI {
-  CHANGE_MODEL = "/changeModel",
-  CHANGE_PROVIDER = "/changeProvider",
-  CURRENT_MODEL = "/currentModel",
-  GENERATE_RESPONSE = "/generateResponse",
-  GET_ESIMATED_COST = "/getEstimatedCost",
-  LIST_AVAILABLE_MODELS = "/listAvailableModels",
-}
-
-export enum ROUTE_AUTHENTICATION {
-  GET_TOKEN = "/getToken",
-}
-
 export enum TYPE_AI_PROVIDER {
   OPEN_AI = "openAI",
   COHERE = "cohere",
@@ -48,7 +29,3 @@ export enum TYPE_AI_QUERY {
   ASSIT = "assit",
   CODE = "code",
 }
-
-export const UNAUTHENTICATED_ROUTES: MAIN_ROUTES[] = [
-  MAIN_ROUTES.AUTHENTICATION,
-];

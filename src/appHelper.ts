@@ -7,13 +7,13 @@ import { NextFunction, Request, Response } from "express";
 import { getJwtSecretKey } from "./utils";
 
 // Constants
-import { UNAUTHENTICATED_ROUTES } from "./constant";
+import { UNAUTHENTICATED_ROUTES } from "../constants/constant";
 
 export default class AppHelper {
   static isUnauthenticatedRoute = (req: Request): boolean => {
     const url = req.url;
 
-    return UNAUTHENTICATED_ROUTES.some(route => {
+    return UNAUTHENTICATED_ROUTES.some((route) => {
       return url.startsWith(route);
     });
   };

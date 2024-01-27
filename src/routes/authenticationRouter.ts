@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { checkPassword, getJwtSecretKey } from "../utils";
 
 // Constants
-import { ROUTE_AUTHENTICATION } from "../constant";
+import { ROUTE_AUTHENTICATION } from "../../constants/constant";
 
 const router = express.Router();
 

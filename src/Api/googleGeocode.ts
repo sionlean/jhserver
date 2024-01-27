@@ -5,13 +5,13 @@ import {
 } from "@googlemaps/google-maps-services-js";
 
 // Local Modules
-import GoogleBase from "./googleBase";
+import GoogleMapBase from "./googleMapBase";
 import DirectionsErrorManager from "../lib/directionsErrorManager";
 
 // Interfaces
 import { CustomError } from "../Interfaces/general";
 
-export default class GoogleGeocode extends GoogleBase {
+export default class GoogleGeocode extends GoogleMapBase {
   private static _instance: GoogleGeocode;
   private constructor() {
     super();
@@ -25,7 +25,6 @@ export default class GoogleGeocode extends GoogleBase {
     return GoogleGeocode._instance;
   };
 
-  private geocode = this.client.geocode;
   private country = "SG";
 
   getGeocodeInfoFromLocation = async (
@@ -40,7 +39,7 @@ export default class GoogleGeocode extends GoogleBase {
     };
 
     try {
-      const { data, statusText } = await this.geocode(geocodeParams);
+      const { data, statusText } = await this.client.geocode(geocodeParams);
       const results = data?.results;
 
       if (statusText !== "OK") {

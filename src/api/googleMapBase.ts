@@ -1,7 +1,7 @@
 // External Modules
 import { Client } from "@googlemaps/google-maps-services-js";
 
-export default class GoogleBase {
+export default class GoogleMapBase {
   constructor() {}
 
   protected client = new Client({});

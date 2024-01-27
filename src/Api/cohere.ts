@@ -14,7 +14,7 @@ import AIErrorManager from "../lib/aiErrorManager";
 import { CustomError } from "../Interfaces/general";
 
 // Constants
-import { MODEL_COHERE } from "../constant";
+import { MODEL_COHERE } from "../../constants/constant";
 
 export default class Cohere implements AIBase {
   private static _instance: Cohere;

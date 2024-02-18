@@ -7,7 +7,7 @@ import { NextFunction, Request, Response } from "express";
 import { getJwtSecretKey } from "./utils";
 
 // Constants
-import { UNAUTHENTICATED_ROUTES } from "../constants/constant";
+import { UNAUTHENTICATED_ROUTES } from "./constants/routes";
 
 export default class AppHelper {
   static isUnauthenticatedRoute = (req: Request): boolean => {

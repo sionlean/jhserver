@@ -6,7 +6,7 @@ import {
 
 // Local Modules
 import GoogleMapBase from "./googleMapBase";
-import DirectionsErrorManager from "../lib/directionsErrorManager";
+import DirectionsErrorManager from "../lib/mapErrorManager";
 
 // Interfaces
 import { CustomError } from "../Interfaces/general";

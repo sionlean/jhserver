@@ -18,8 +18,7 @@ export enum ROUTE_AUTHENTICATION {
 }
 
 export enum ROUTE_MAP {
-  DIRECTIONS = "/directions",
-  PLACES = "/places",
+  GET_LOCATION = "/getLocation",
 }
 
 export const UNAUTHENTICATED_ROUTES: MAIN_ROUTES[] = [

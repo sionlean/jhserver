@@ -4,7 +4,7 @@ import ErrorManagerBase from "./errorManagerBase";
 // Interfaces
 import { CustomError } from "../Interfaces/general";
 
-export default class DirectionsErrorManager extends ErrorManagerBase {
+export default class mapErrorManager extends ErrorManagerBase {
   private constructor() {
     super();
   }
@@ -18,11 +18,11 @@ export default class DirectionsErrorManager extends ErrorManagerBase {
     };
   };
 
-  static getErrorGettingNearbyPlaces = (err: unknown): CustomError => {
+  static getErrorGettingPlaces = (err: unknown): CustomError => {
     return {
       error: {
-        message: "Error getting nearby places",
-        code: "ERROR_GETTING_NEARBY_PLACES",
+        message: "Error getting places",
+        code: "ERROR_GETTING_PLACES",
         details: JSON.stringify(err),
       },
     };

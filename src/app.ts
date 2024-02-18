@@ -8,7 +8,7 @@ import AIRouter from "./routes/aiRouter";
 import AppHelper from "./appHelper";
 import AuthenticationRouter from "./routes/authenticationRouter";
 import GoogleMapRouter from "./routes/googleMapRouter";
-import GoogleNearby from "./api/googleNearby";
+import GoogleLocation from "./api/googleLocation";
 
 // Utils
 import { getWhitelistedOrigins } from "./utils";
@@ -32,5 +32,8 @@ app.use(MAIN_ROUTES.MAPS, GoogleMapRouter);
 
 app.listen(process.env.PORT, async () => {
   console.log("Server started...");
-  const resp = await GoogleNearby.getInstance().getNearbyPlaces("Beauty world");
+  const resp = await GoogleLocation.getInstance().getLocation(
+    "highly rated chicken rice"
+  );
+  console.log(resp);
 });

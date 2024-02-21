@@ -12,6 +12,7 @@ const router = express.Router();
 
 router.post(ROUTE_AUTHENTICATION.GET_TOKEN, (req: Request, res: Response) => {
   const password = req.body.password;
+
   if (checkPassword(password)) {
     const payload: Object = { message: "Access granted" };
     const options: jwt.SignOptions = { expiresIn: "7d" };

@@ -32,8 +32,8 @@ app.use(MAIN_ROUTES.MAPS, GoogleMapRouter);
 
 app.listen(process.env.PORT, async () => {
   console.log("Server started...");
-  const resp = await GoogleLocation.getInstance().getLocation(
-    "highly rated chicken rice"
-  );
-  console.log(resp);
+  // const resp = await GoogleLocation.getInstance().getLocation(
+  //   "highly rated chicken rice"
+  // );
+  // console.log(resp);
 });

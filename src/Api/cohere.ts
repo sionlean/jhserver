@@ -1,17 +1,20 @@
 // External Modules
-import cohere from "cohere-ai";
+import { CohereClient } from "cohere-ai";
 import {
-  classifyRequest,
-  generateRequest,
-  summarizeRequest,
-} from "cohere-ai/dist/models";
+  ClassifyRequest,
+  ClassifyResponse,
+  GenerateRequest,
+  Generation,
+  SummarizeRequest,
+  SummarizeResponse,
+} from "cohere-ai/api";
 
 // Local Modules
 import AIBase from "./aiBase";
 import AIErrorManager from "../lib/aiErrorManager";
 
 // Interfaces
-import { CustomError } from "../Interfaces/general";
+import { CustomError, ServerResponse } from "../Interfaces/general";
 
 // Constants
 import { MODEL_COHERE } from "../constants/constant";
@@ -28,69 +31,92 @@ export default class Cohere implements AIBase {
     return Cohere._instance;
   };
 
-  cohere = cohere.init(process.env.COHERE_TOKEN!);
+  cohere = new CohereClient({ token: process.env.COHERE_TOKEN! });
   currentModel: string = MODEL_COHERE.COMMAND;
 
-  changeModel = (model: string): string | CustomError => {
-    const currentModels: string[] = Object.values(MODEL_COHERE);
-    const isValidModel = currentModels.includes(model);
+  changeModel = (model: string): ServerResponse<string | CustomError> => {
+    const currentModels: string[] = Object.keys(MODEL_COHERE).map((key) =>
+      key.toLowerCase()
+    );
+    const isValidModel = currentModels.includes(model.toLowerCase());
 
     if (isValidModel) {
-      this.currentModel = model;
-      return `Model successfullly changed to ${model}`;
+      const modelName = (MODEL_COHERE as { [key: string]: string })[
+        model.toUpperCase()
+      ];
+
+      this.currentModel = modelName;
+      return { code: 200, reply: `Model successfullly changed to ${model}` };
     } else {
-      return AIErrorManager.getInvalidModelError(model);
+      return { code: 422, reply: AIErrorManager.getInvalidModelError(model) };
     }
   };
 
-  getCurrentModel = (): string | CustomError => {
+  getCurrentModel = (): ServerResponse<string | CustomError> => {
     const currentModels: string[] = Object.values(MODEL_COHERE);
     const isValidModel = currentModels.includes(this.currentModel);
 
     if (isValidModel) {
-      return this.currentModel;
+      return { code: 200, reply: this.currentModel };
     } else {
-      return AIErrorManager.getCurrentModelNotFoundError();
+      return {
+        code: 400,
+        reply: AIErrorManager.getCurrentModelNotFoundError(),
+      };
     }
   };
 
-  listAvailableModels = (): string[] | CustomError => {
-    return (
-      Object.values(MODEL_COHERE) ||
-      AIErrorManager.getFailedToListAIModelsError()
-    );
+  listAvailableModels = (): ServerResponse<string[] | CustomError> => {
+    const models = Object.values(MODEL_COHERE);
+
+    if (models) {
+      return { code: 200, reply: models };
+    } else {
+      return {
+        code: 400,
+        reply: AIErrorManager.getFailedToListAIModelsError(),
+      };
+    }
   };
 
-  generateResponse = (
+  generateResponse = async (
     text: string
-  ): Promise<string | CustomError> | CustomError => {
-    if (!text) return AIErrorManager.getMissingTextParamError();
+  ): Promise<ServerResponse<string | CustomError>> => {
+    if (!text) {
+      return Promise.resolve({
+        code: 400,
+        reply: AIErrorManager.getMissingTextParamError(),
+      });
+    }
 
-    const promise = new Promise((resolve, reject) => {
+    const promise: Promise<
+      Generation | ClassifyResponse | SummarizeResponse | CustomError | null
+    > = new Promise(async (resolve, reject) => {
       try {
         switch (this.currentModel) {
           case MODEL_COHERE.COMMAND:
           case MODEL_COHERE.COMMAND_LIGHT:
           case MODEL_COHERE.GENERATION:
           case MODEL_COHERE.GENERATION_LIGHT:
-            const generateConfig: generateRequest = {
-              max_tokens: 5000,
+            const generateConfig: GenerateRequest = {
+              maxTokens: 5000,
               model: this.currentModel,
               prompt: text,
               temperature: 1,
             };
-            resolve(cohere.generate(generateConfig));
+
+            resolve(this.cohere.generate(generateConfig));
             break;
           case MODEL_COHERE.REPRESENTATION:
           case MODEL_COHERE.REPRESENTATION_LIGHT:
           case MODEL_COHERE.REPRESENTATION_MULTILINGUAL:
-            const classifyConfig: classifyRequest = {
+            const classifyConfig: ClassifyRequest = {
               examples: [],
               inputs: [],
               model: this.currentModel,
               preset: "",
             };
-            resolve(cohere.classify(classifyConfig));
+            resolve(this.cohere.classify(classifyConfig));
             break;
           case MODEL_COHERE.RERANK:
           case MODEL_COHERE.RERANK_MULTILINGUAL:
@@ -99,33 +125,51 @@ export default class Cohere implements AIBase {
             break;
           case MODEL_COHERE.SUMMARIZE:
           case MODEL_COHERE.SUMMARIZE_LIGHT:
-            const summarizeConfig: summarizeRequest = {
-              length: "",
+            console.log("summarize");
+            const summarizeConfig: SummarizeRequest = {
               model: this.currentModel,
               text: text,
             };
-            resolve(cohere.summarize(summarizeConfig));
+            resolve(this.cohere.summarize(summarizeConfig));
             break;
           default:
             resolve(AIErrorManager.getInvalidModelError(this.currentModel));
         }
       } catch (err) {
+        console.log(err);
         reject(err);
       }
     });
 
-    return promise
-      .then((resp: any) => {
-        if (!resp) throw Error("Unknown Error - Empty Response");
+    try {
+      const resp = await promise;
+      if (!resp) throw Error("Unknown Error - Empty Response");
 
-        if (resp?.statusCode === 200) {
-          return resp;
-        } else {
-          return AIErrorManager.getFailedToGenerateAIResponseError(resp);
-        }
-      })
-      .catch((err) => {
-        return AIErrorManager.getFailedToGenerateAIResponseError(err);
-      });
+      const response: ServerResponse<string | CustomError> = {
+        code: 400,
+        reply: AIErrorManager.getFailedToGenerateAIResponseError(resp),
+      };
+
+      if ("generations" in resp) {
+        const generation = resp.generations[0].text || response.reply;
+        response.code = 200;
+        response.reply = generation;
+      } else if ("classifications" in resp) {
+        const prediction = resp.classifications[0].prediction || response.reply;
+        response.code = 200;
+        response.reply = prediction;
+      } else if ("summary" in resp) {
+        const summary = resp.summary || response.reply;
+        response.code = 200;
+        response.reply = summary;
+      }
+      return response;
+    } catch (err) {
+      const response: ServerResponse<CustomError> = {
+        code: 400,
+        reply: AIErrorManager.getFailedToGenerateAIResponseError(err),
+      };
+      return response;
+    }
   };
 }

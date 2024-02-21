@@ -21,7 +21,7 @@ export enum MODEL_COHERE {
 }
 
 export enum TYPE_AI_PROVIDER {
-  OPEN_AI = "openAI",
+  OPEN_AI = "openai",
   COHERE = "cohere",
 }
 

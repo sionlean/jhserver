@@ -3,21 +3,24 @@ import express, { Request, Response } from "express";
 
 // LocalModules
 import GoogleLocation from "../api/googleLocation";
-import MapErrorManager from "../lib/mapErrorManager";
 
 // Constants
 import { ROUTE_MAP } from "../constants/routes";
 
 const router = express.Router();
 
-router.get(ROUTE_MAP.GET_LOCATION, async (req: Request, res: Response) => {
+router.post(ROUTE_MAP.GET_LOCATION, async (req: Request, res: Response) => {
   const { query } = req.body;
-  const resp = await GoogleLocation.getInstance().getLocation(query);
+  if (!query) {
+    return res.status(400).send({ data: "Please input a query" });
+  }
 
-  if (MapErrorManager.isCustomError(resp)) {
-    return res.status(401).send(resp);
+  const { code, reply } = await GoogleLocation.getInstance().getLocation(query);
+
+  if (code === 200) {
+    return res.status(code).send({ data: { location: reply } });
   } else {
-    return res.status(200).send({ data: { places: resp } });
+    return res.status(code).send(reply);
   }
 });
 

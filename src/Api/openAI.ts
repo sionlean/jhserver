@@ -12,7 +12,7 @@ import AIBase from "./aiBase";
 import AIErrorManager from "../lib/aiErrorManager";
 
 // Interfaces
-import { CustomError } from "../Interfaces/general";
+import { CustomError, ServerResponse } from "../Interfaces/general";
 
 // Constants
 import { MODEL_OPEN_AI, TYPE_AI_QUERY } from "../constants/constant";
@@ -45,49 +45,68 @@ export default class OpenAI implements AIBase {
   openai = new OpenAIApi(this.configuration);
   currentModel: string = MODEL_OPEN_AI.CHAT_GPT;
 
-  changeModel = (model: string): string | CustomError => {
+  changeModel = (model: string): ServerResponse<string | CustomError> => {
     const currentModels: string[] = Object.values(MODEL_OPEN_AI);
     const isValidModel = currentModels.includes(model);
 
     if (isValidModel) {
       this.currentModel = model;
-      return `Model successfullly changed to ${model}`;
+      return { code: 200, reply: `Model successfullly changed to ${model}` };
     } else {
-      return AIErrorManager.getInvalidModelError(model);
+      return { code: 422, reply: AIErrorManager.getInvalidModelError(model) };
     }
   };
 
-  getCurrentModel = (): string | CustomError => {
+  getCurrentModel = (): ServerResponse<string | CustomError> => {
     const currentModels: string[] = Object.values(MODEL_OPEN_AI);
     const isValidModel = currentModels.includes(this.currentModel);
 
     if (isValidModel) {
-      return this.currentModel;
+      return { code: 200, reply: this.currentModel };
     } else {
-      return AIErrorManager.getCurrentModelNotFoundError();
+      return {
+        code: 400,
+        reply: AIErrorManager.getCurrentModelNotFoundError(),
+      };
     }
   };
 
-  getEstimatedCost = (): string | CustomError => {
-    return (
-      getEstimatedCostSinceStartup() ||
-      AIErrorManager.getFailedToGetEstimatedCostError()
-    );
+  getEstimatedCost = (): ServerResponse<string | CustomError> => {
+    const estimatedCost = getEstimatedCostSinceStartup();
+
+    if (estimatedCost) {
+      return { code: 200, reply: estimatedCost };
+    } else {
+      return {
+        code: 400,
+        reply: AIErrorManager.getFailedToGetEstimatedCostError(),
+      };
+    }
   };
 
-  listAvailableModels = (): string[] | CustomError => {
-    return (
-      Object.values(MODEL_OPEN_AI) ||
-      AIErrorManager.getFailedToListAIModelsError()
-    );
+  listAvailableModels = (): ServerResponse<string[] | CustomError> => {
+    const models = Object.values(MODEL_OPEN_AI);
+
+    if (models) {
+      return { code: 200, reply: models };
+    } else {
+      return {
+        code: 400,
+        reply: AIErrorManager.getFailedToListAIModelsError(),
+      };
+    }
   };
 
   generateResponse = (
     text: string,
     includePrevResp = false,
     type = TYPE_AI_QUERY.ASSIT
-  ): Promise<string | CustomError> | CustomError => {
-    if (!text) return AIErrorManager.getMissingTextParamError();
+  ): Promise<ServerResponse<string | CustomError>> => {
+    if (!text)
+      return Promise.resolve({
+        code: 422,
+        reply: AIErrorManager.getMissingTextParamError(),
+      });
 
     switch (this.currentModel) {
       case MODEL_OPEN_AI.CHAT_GPT:
@@ -104,7 +123,10 @@ export default class OpenAI implements AIBase {
       case MODEL_OPEN_AI.DAVINCI:
         return this.generateOpenAIResponse(text);
       default:
-        return AIErrorManager.getInvalidModelError(text);
+        return Promise.resolve({
+          code: 400,
+          reply: AIErrorManager.getInvalidModelError(text),
+        });
     }
   };
 
@@ -113,7 +135,7 @@ export default class OpenAI implements AIBase {
     errMethod:
       | typeof AIErrorManager.getFailedToGenerateAICodeError
       | typeof AIErrorManager.getFailedToGenerateAIResponseError
-  ): Promise<string | CustomError> => {
+  ): Promise<ServerResponse<string | CustomError>> => {
     const chatRequest: CreateChatCompletionRequest = {
       model: this.currentModel,
       messages,
@@ -128,16 +150,20 @@ export default class OpenAI implements AIBase {
       const tokenUsed = response.data.usage?.total_tokens;
       addTokenUsedSinceStartup(tokenUsed);
 
-      return reply || errMethod(new Error("No content"));
+      if (reply) {
+        return { code: 200, reply: reply };
+      } else {
+        throw new Error("No content");
+      }
     } catch (err) {
-      return errMethod(err);
+      return { code: 400, reply: errMethod(err) };
     }
   };
 
   private generateChatgptCode = (
     text: string,
     includePrevResp: boolean
-  ): Promise<string | CustomError> => {
+  ): Promise<ServerResponse<string | CustomError>> => {
     // Logic to get previous chat message for context
     const message: ChatCompletionRequestMessage = {
       role: "user",
@@ -163,7 +189,7 @@ export default class OpenAI implements AIBase {
   private generateChatgptResponse = (
     text: string,
     includePrevResp: boolean
-  ): Promise<string | CustomError> => {
+  ): Promise<ServerResponse<string | CustomError>> => {
     // Logic to get previous chat message for context
     const message: ChatCompletionRequestMessage = {
       role: "user",
@@ -188,7 +214,7 @@ export default class OpenAI implements AIBase {
 
   private generateOpenAIResponse = async (
     text: string
-  ): Promise<string | CustomError> => {
+  ): Promise<ServerResponse<string | CustomError>> => {
     const request: CreateCompletionRequest = {
       model: this.currentModel,
       prompt: text,
@@ -200,14 +226,16 @@ export default class OpenAI implements AIBase {
       const response = await this.openai.createCompletion(request);
       const reply = response.data.choices[0].text;
 
-      return (
-        reply ||
-        AIErrorManager.getFailedToGenerateAIResponseError(
-          new Error("No Content")
-        )
-      );
+      if (reply) {
+        return { code: 200, reply };
+      } else {
+        throw new Error("No Content");
+      }
     } catch (err) {
-      return AIErrorManager.getFailedToGenerateAIResponseError(err);
+      return {
+        code: 400,
+        reply: AIErrorManager.getFailedToGenerateAIResponseError(err),
+      };
     }
   };
 }

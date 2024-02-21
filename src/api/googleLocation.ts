@@ -6,6 +6,9 @@ import DirectionsErrorManager from "../lib/mapErrorManager";
 import GoogleGeocode from "./googleGeocode";
 import GoogleMapBase from "./googleMapBase";
 
+// Interfaces
+import { ServerResponse } from "../Interfaces/general";
+
 export default class GoogleLocation extends GoogleMapBase {
   private static _instance: GoogleLocation;
   private constructor() {
@@ -22,7 +25,7 @@ export default class GoogleLocation extends GoogleMapBase {
 
   private searchLocation = this.client.textSearch;
 
-  getLocation = async (query: string): Promise<any> => {
+  getLocation = async (query: string): Promise<ServerResponse<any>> => {
     try {
       const { data, statusText } = await this.searchLocation({
         params: {
@@ -36,6 +39,8 @@ export default class GoogleLocation extends GoogleMapBase {
         },
       });
 
+      console.log(data, statusText);
+
       const results = data.results;
 
       if (statusText !== "OK") {
@@ -43,7 +48,7 @@ export default class GoogleLocation extends GoogleMapBase {
       } else if (data?.error_message) {
         throw new Error(data?.error_message);
       } else if (!results?.length) {
-        throw new Error("No results found");
+        return { code: 200, reply: "No results found" };
       } else {
         const filteredResults = results
           .filter((result) => {
@@ -67,10 +72,13 @@ export default class GoogleLocation extends GoogleMapBase {
             );
           });
 
-        return filteredResults;
+        return { code: 200, reply: filteredResults };
       }
     } catch (err: any) {
-      return DirectionsErrorManager.getErrorGettingPlaces(err.message);
+      return {
+        code: 400,
+        reply: DirectionsErrorManager.getErrorGettingPlaces(err.message),
+      };
     }
   };
 }
